@@ -6,16 +6,19 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+import pytest
 
 class TestTest_Sauce(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
         self.driver.get("https://www.saucedemo.com")
+
     def tearDown(self):
         self.driver.quit()
-    def test_invalid_login(self):
-        self.driver.maximize_window()
+
+    @pytest.mark.skip("username", "password", [("1", "1"),("kullaniciadim", "sifrem")])
+    def test_invalid_login(self, username, password):
         self.driver.get("https://www.saucedemo.com/")
         WebDriverWait(self.driver, 5).until(expected_conditions.visibility_of_element_located((By.ID, "user-name")))
         usernameInput = self.driver.find_element(By.ID, "user-name")
@@ -28,7 +31,6 @@ class TestTest_Sauce(TestCase):
         errorMessage = self.driver.find_element(By.XPATH, "//*[@id='login_button_container']/div/form/div[3]/h3")
         print(errorMessage)
         assert errorMessage.text == "Epic sadface: Username and password do not match any user in this service"
-        #print(f"Test sonucu: {testResult}")
         sleep(2)
 
     def test_valid_login(self):
