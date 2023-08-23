@@ -9,12 +9,14 @@ from selenium.webdriver.support import expected_conditions
 import pytest
 from pathlib import Path
 from datetime import date
-
+import openpyxl
+#import constants.globalConstants as const
+from constants import globalConstants as const
 class TestTest_Sauce(TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.driver.get("https://www.saucedemo.com")
+        self.driver.get(const.URL)
         # Bugünün tarhini al. Bu tarih adında bir klasör var mı onu bir kontrol et. Yoksa o tarih isminde yeni bir klasör oluştur.
         self.folderPath = str(date.today())
         Path(self.folderPath).mkdir(exist_ok=True)
@@ -23,9 +25,21 @@ class TestTest_Sauce(TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    @pytest.mark.parameterize("username", "password", [("1", "1"),("kullaniciadim", "sifrem")])
+    def getData():
+        excelFile = openpyxl.load_workbook("data/invalid_login.xlsx")
+        selectedSheet = excelFile["Sheet1"]
+        totalRows = selectedSheet.max_rows
+        data = []
+        for i in range(2, totalRows + 1):
+            username = selectedSheet.cell(i, 1).value
+            password = selectedSheet.cell(i, 2).value
+            tupleData = (username, password)
+            data.append(tupleData)
+        return data
+
+    @pytest.mark.parameterize("username", "password", getData())
     def test_invalid_login(self, username, password):
-        self.driver.get("https://www.saucedemo.com/")
+        self.driver.get(const.URL)
         self.waitForElementVisible((By.ID, "user-name"))
         usernameInput = self.driver.find_element(By.ID, "user-name")
         self.waitForElementVisible((By.ID, "password"))
